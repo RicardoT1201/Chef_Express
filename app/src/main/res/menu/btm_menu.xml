@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item android:title="Home"
+        android:icon="@drawable/home_svgrepo_com"
+        android:id="@+id/homeFragment"/>
+
+    <item android:title="Favorites"
+        android:icon="@drawable/heart_like_svgrepo_com"
+        android:id="@+id/favoritesFragment"/>
+
+    <item android:title="Categories"
+        android:icon="@drawable/category_svgrepo_co"
+        android:id="@+id/categoriesFragment"/>
+
 </menu>
