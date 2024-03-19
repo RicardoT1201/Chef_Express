@@ -1,50 +1,73 @@
 package com.example.proyecto_a.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.proyecto_a.R
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.example.proyecto_a.activities.MealActivity
+import com.example.proyecto_a.databinding.FragmentHomeBinding
 import com.example.proyecto_a.pojo.Meal
-import com.example.proyecto_a.pojo.MealList
-import com.example.proyecto_a.retrofit.RetrofitInstance
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
+import com.example.proyecto_a.videoModel.HomeVideoModel
 class HomeFragment : Fragment() {
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var homeMvvm: HomeVideoModel
+    private lateinit var randomMeal:Meal
+
+    companion object{
+        const val MEAL_ID = "com.example.proyecto_a.fragments.idMeal"
+        const val MEAL_NAME = "com.example.proyecto_a.fragments.nameMeal"
+        const val MEAL_THUMB = "com.example.proyecto_a.fragments.thumbMeal"
+
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        homeMvvm = ViewModelProvider(this).get(HomeVideoModel::class.java)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        RetrofitInstance.api.getRandomMeal().enqueue(object : Callback<MealList> {
-            override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
-                if (response.body() !=null){
-                    val randomMeal: Meal = response.body()!!.meals[0]
-                    Log.d("TEST", "meal id ${randomMeal.idMeal} name ${randomMeal.strMeal}")
-                }else{
-                return
-                }
-            }
-
-            override fun onFailure(call: Call<MealList>, t: Throwable) {
-             Log.d("HomeFragment", t.message.toString())
-            }
-        })
+        homeMvvm.getRandomMeal()
+        observerRandomMeal()
+        onRandomMealClick()
     }
+
+    private fun onRandomMealClick() {
+        binding.randomMealCard.setOnClickListener{
+            val intent = Intent(activity,MealActivity::class.java)
+            intent.putExtra(MEAL_ID,randomMeal.idMeal)
+            intent.putExtra(MEAL_NAME,randomMeal.strMeal)
+            intent.putExtra(MEAL_THUMB,randomMeal.strMealThumb)
+            startActivity(intent)
+        }
+    }
+
+    private fun observerRandomMeal() {
+        homeMvvm.observeRandomMealLivedata().observe(viewLifecycleOwner
+        ) { meal ->
+            Glide.with(this@HomeFragment)
+                .load(meal!!.strMealThumb)
+                .into(binding.imgRandomMeal)
+
+            this.randomMeal = meal
+
+        }
+    }
+
+
 }
