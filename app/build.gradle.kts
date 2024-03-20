@@ -94,11 +94,19 @@ dependencies {
 
 
 
-// VideoModel MVVM no me va
+// VideoModel MVVM
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.extensions)
+//room
+    dependencies {
+    }
 
+        val room_version = "2.6.1"
+        implementation("androidx.room:room-runtime:$room_version")
+        annotationProcessor("androidx.room:room-compiler:$room_version")
+        implementation ("androidx.room:room-compiler:$room_version")
+        implementation("androidx.room:room-ktx:$room_version")
 
 }
