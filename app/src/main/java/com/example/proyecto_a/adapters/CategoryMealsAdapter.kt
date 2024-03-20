@@ -30,8 +30,10 @@ class CategoryMealsAdapter : RecyclerView.Adapter<CategoryMealsAdapter.CategoryM
     }
 
     override fun onBindViewHolder(holder: CategoryMealsViewModel, position: Int) {
-     Glide.with((holder.itemView).load(mealsList[position].strMealThumb).into(holder.binding.imgMeal))
+        Glide.with(holder.itemView.context)
+            .load(mealsList[position].strMealThumb)
+            .into(holder.binding.imgMeal)
         holder.binding.tvMealName.text = mealsList[position].strMeal
-
     }
+
 }
