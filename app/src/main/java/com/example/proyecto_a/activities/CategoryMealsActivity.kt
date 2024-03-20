@@ -22,7 +22,7 @@ class CategoryMealsActivity : AppCompatActivity() {
 
         prepareRecyclerView()
 
-        categoryMealsViewModel = ViewModelProvider.of(this)[CategoryMealsViewModel::class.java]
+        categoryMealsViewModel = ViewModelProvider.of(this)(CategoryMealsViewModel::class.java)
 
         categoryMealsViewModel.getMealsByCategory(intent.getStringExtra(HomeFragment.CATEGORY_NAME)!!)
 

@@ -2,4 +2,6 @@
 <resources>
     <item name="host_fragment" type="id" />
     <item name="img_random_meal" type="id" />
+    <item name="frag_host" type="id" />
+    <item name="bottom_navigation" type="id" />
 </resources>

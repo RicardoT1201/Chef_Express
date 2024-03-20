@@ -5,55 +5,59 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.proyecto_a.R
+import androidx.lifecycle.Observer
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.proyecto_a.activities.MainActivity
+import com.example.proyecto_a.adapters.MealsAdapter
+import com.example.proyecto_a.databinding.FragmentFavoritesBinding
+import com.example.proyecto_a.videoModel.HomeViewModel
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FavoritesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FavoritesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding:FragmentFavoritesBinding
+    private lateinit var viewModel: HomeViewModel
+    private lateinit var  favoriteAdapter:MealsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            var ARG_PARAM1 = null
-            param1 = it.getString(ARG_PARAM1)
-            var ARG_PARAM2 = null
-            param2 = it.getString(ARG_PARAM2)
+        viewModel = (activity as MainActivity).viewModel
         }
     }
 
-    override fun onCreateView(
+    fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorites, container, false)
+    ): View {
+        var binding = FragmentFavoritesBinding.inflate(inflater)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FavoritesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FavoritesFragment().apply {
-                arguments = Bundle().apply {
-                    var ARG_PARAM1 = null
-                    putString(ARG_PARAM1, param1)
-                    var ARG_PARAM2 = null
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val onViewCreated = super.onViewCreated(view, savedInstanceState)observeFavorites()
+
+
+        private fun prepareRecycler() {
+            favoritesAdapter = MealsAdapter()
+            binding.rvFavorites.apply{
+                layoutManager = GridLayoutManager(context,2,GridLayoutManager.VERTICAL,false)
+                adapter = favoritesAdapter
+        }
+
+        private fun observeFavorites() {
+            viewModel.observeFavoritesMealsLiveData().observe(requireActivity(),Observer{ meals->
+                favoritesAdapter.differ.submitList(meals)
+
+            })
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            prepareRecycler()
+            observeFavorites()
+
     }
+
+}
+
 }

@@ -2,6 +2,7 @@ package com.example.proyecto_a.activities
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,20 +18,12 @@ import com.bumptech.glide.Glide
 import com.example.proyecto_a.R
 import com.example.proyecto_a.activities.ui.theme.Proyecto_aTheme
 import com.example.proyecto_a.databinding.ActivityMealBinding
+import com.example.proyecto_a.db.MealDataBase
 import com.example.proyecto_a.fragments.HomeFragment
 import com.example.proyecto_a.pojo.Meal
 import com.example.proyecto_a.videoModel.MealViewModel
+import com.example.proyecto_a.videoModel.MealViewModelFactory
 
-private val Any.tvInstructionsSteps: Any
-    get() {
-        TODO("Not yet implemented")
-    }
-private val Nothing.strCategory: String
-    get() {
-        TODO("Not yet implemented")
-    }
-
-@Suppress("UNREACHABLE_CODE")
 class MealActivity : ComponentActivity() {
     private lateinit var mealId:String
     private lateinit var mealName:String
@@ -41,8 +34,9 @@ class MealActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMealBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_meal)
-
-        mealMvvm = ViewModelProvider(this)[MealViewModel::class.java]
+        val mealDataBase = MealDataBase.getInstance(this)
+        val viewModelFactory = MealViewModelFactory(mealDataBase)
+       mealMvvm = ViewModelProvider(this,viewModelFactory).get(MealViewModel::class.java)
 
         getMealInformationFromIntent()
 
@@ -53,22 +47,31 @@ class MealActivity : ComponentActivity() {
         mealMvvm.getMealDetail(mealId)
         observeMealDetailsLiveData()
 
+        onFavoriteClick()
+
     }
 
+    private fun onFavoriteClick() {
+        binding.btnAddToFavorites.setOnClickListener{
+            mealToSave?.let {
+                mealMvvm.insertMeal(it)
+                Toast.makeText(this, "Meal saved",Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private var mealToSave:Meal?=null
     private fun observeMealDetailsLiveData() {
         mealMvvm.observerMealDetailsLiveData().observe(this,object : Observer<Meal>{
-            fun onChanged(t: Meal?) {
+
+            override fun onChanged(t: Meal) {
                 onResponseCase()
                 val meal = t
+                mealToSave = meal
 
                 binding.tvCategory.text = "Category : ${meal!!.strCategory}"
                 binding.tvArea.text = "Area : ${meal.strArea}"
-                binding.tvInstructionsSteps.text = meal.strInstructions
-
-            }
-
-            override fun onChanged(value: Meal) {
-                TODO("Not yet implemented")
+                binding.tvInstructionsSt.text = meal.strInstructions
             }
 
         })
