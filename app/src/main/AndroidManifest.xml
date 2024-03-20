@@ -13,6 +13,17 @@
         android:theme="@style/Theme.Proyecto_a"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activities.CategoryMealsActivity"
+            android:exported="true"
+            android:label="@string/title_activity_category_meals"
+            android:theme="@style/Theme.Proyecto_a">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activities.MealActivity"
             android:exported="false"
             android:label="@string/title_activity_meal"
