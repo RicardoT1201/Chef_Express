@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.proyecto_a.db.MealDataBase
 import com.example.proyecto_a.pojo.Category
 import com.example.proyecto_a.pojo.CategoryList
 import com.example.proyecto_a.pojo.MealsByCategoryList
@@ -16,10 +17,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HomeViewModel():ViewModel() {
+class HomeViewModel(
+    private val mealDataBase: MealDataBase
+):ViewModel() {
     private var randomMealLiveData = MutableLiveData<Meal>()
     private var popularItemsLiveData = MutableLiveData<List<MealsByCategory>>()
     private var categoriesLiveData = MutableLiveData<List<Category>>()
+    private var favoritesMealsLiveData = mealDataBase.mealDao().getAllMeals()
+    private val searchedMealsLiveData = MutableLiveData<List<Meal>>()
     fun getRandomMeal(){
         RetrofitInstance.api.getRandomMeal().enqueue(object : Callback<MealList> {
             @SuppressLint("CheckResult")
@@ -77,6 +82,26 @@ class HomeViewModel():ViewModel() {
         })
     }
 
+
+
+    fun searchMeals(searchQuery:String) = RetrofitInstance.api.searchMeals(searchQuery).enqueue(
+        object : Callback <MealList>{
+            override fun onResponse(call: Call<MealList>, response: Response<MealList>) {
+                val mealsList = response.body()?.meals
+                mealsList?.let {
+                    searchedMealsLiveData.postValue(it)
+
+                }
+            }
+
+            override fun onFailure(call: Call<MealList>, t: Throwable) {
+                Log.e("HomeViewModel",t.message.toString())
+
+
+            }
+        }
+    )
+    fun observeSearchedMealsLivedata() : LiveData<List<Meal>> = searchedMealsLiveData
     fun observeRandomMealLivedata():LiveData<Meal>{
         return randomMealLiveData
     }
@@ -88,6 +113,10 @@ class HomeViewModel():ViewModel() {
     fun observeCategoriesLiveData():LiveData<List<Category>>{
         return categoriesLiveData
 
+    }
+
+    fun observeFavoritesMealsLiveData():LiveData<List<Meal>>{
+        return favoritesMealsLiveData
     }
 
 }
